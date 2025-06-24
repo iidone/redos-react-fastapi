@@ -4,7 +4,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select, delete
 from src.models.users import UsersModel
 from src.schemas.users import DeleteMasterRequest, UsersSchema, UserResponce, UserCreate
-from src.api.dependencies import (
+from src.services.auth import (
     add_to_blacklist,
     pwd_context, 
     SessionDep,
@@ -15,7 +15,7 @@ from src.api.dependencies import (
     verify_password
 )
 
-router = APIRouter(prefix="/users")
+router = APIRouter(prefix="/v1/users")
 
 @router.post("/login", tags=["Пользователи"],summary = ["Авторизация"])
 async def login_user(
@@ -84,7 +84,7 @@ async def add_user(user_data: UsersSchema, session: SessionDep):
             first_name=user_data.first_name,
             last_name=user_data.last_name,
             password=pwd_context.hash(user_data.password),
-            contact=user_data.contact,
+            email=user_data.email,
         )
         session.add(new_user)
         await session.commit()
@@ -104,7 +104,7 @@ async def add_user(user_data: UsersSchema, session: SessionDep):
 
 
 
-@router.get("/all_users", response_model=List[UserResponce], tags=["Пользователи"], summary=["Получить всех пользователей"])
+@router.get("/all_user", response_model=List[UserResponce], tags=["Пользователи"], summary=["Получить всех пользователей"])
 async def get_all_users(session: SessionDep):
     try:
         result = await session.execute(select(UsersModel))
