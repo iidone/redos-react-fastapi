@@ -1,0 +1,55 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.box {
+    height: 70vh;
+    width: 25vw;
+    border: 2px solid #cd3d3c;
+    background-color: rgb(51 51 51);
+    border-radius: 1rem;
+    color: aliceblue;
+    padding: 3rem;
+}
+
+.centrical {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.button.is-primary {
+    background-color: #cd3d3c;
+}
+
+.button.is-primary:hover {
+    background-color: #d45050;
+    color: aliceblue;
+}
+
+.input {
+    background-color: #222222;
+}
+
+.input:active {
+    border: 2px solid #cd3d3c;
+}
+
+.input::after {
+    box-shadow: #cd3d3c;
+    border: 2px solid #cd3d3c;
+}
+
+.input:focus {
+    border-color: #cd3d3c;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(205, 61, 60, 0.3);
+}
+
+.label {
+    user-select: none;
+}
