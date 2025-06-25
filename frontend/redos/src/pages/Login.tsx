@@ -17,7 +17,7 @@ const Login = () => {
   };
 
   return (
-    <form className="box" onSubmit={handleSubmit}>
+    <form className="box login" onSubmit={handleSubmit}>
       <div className="field">
         <label className="label">Email</label>
         <div className="control">

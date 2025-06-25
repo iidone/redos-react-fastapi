@@ -6,7 +6,7 @@ body, html {
     align-items: center;
 }
 
-.box {
+.box.login {
     height: 35vh;
     width: 25vw;
     border: 2px solid #cd3d3c;

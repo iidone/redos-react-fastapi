@@ -1,0 +1,34 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.notfound {
+    border-bottom: 2px solid #cd3d3c;
+    user-select: none;
+    transition: all ease .3s;
+}
+
+.notfound h1 {
+    font-size: 10em;
+    display: inline;
+    color: #cd3d3c;
+    transition: all ease .3s;
+}
+
+.notfound p {
+    font-size: 3em;
+    display: inline;
+    transition: all ease .3s;
+}
+
+.notfound p:hover {
+    color: aliceblue;
+}
+
+.notfound h1:hover {
+    color: #d45050;
+}
