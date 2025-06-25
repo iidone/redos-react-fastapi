@@ -4,7 +4,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.pool import NullPool
 from src.models import *
 
-DATABASE_URL = "postgresql+asyncpg://postgres:password@localhost:5432/redos"
+DATABASE_URL = "postgresql+asyncpg://postgres:admin@localhost:5432/redos"
 
 engine = create_async_engine(DATABASE_URL, echo=True, poolclass=NullPool)
 
