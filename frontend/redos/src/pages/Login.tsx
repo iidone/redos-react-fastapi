@@ -17,6 +17,13 @@ const Login = () => {
   };
 
   return (
+    <>
+    <header className="dashboard-header" style={{ backgroundColor: 'rgb(51 51 51)' }}>
+      <div className="central-header-content">
+        <img src="src/assets/logo.png" alt="" className="logo"/>
+        <h1 className="header-title">RED OS</h1>
+      </div>
+    </header>
     <form className="box login" onSubmit={handleSubmit}>
       <div className="field">
         <label className="label">Email</label>
@@ -35,6 +42,7 @@ const Login = () => {
         <button className="button is-primary" type="submit">Login</button>
       </div>
     </form>
+    </>
   );
 };
 

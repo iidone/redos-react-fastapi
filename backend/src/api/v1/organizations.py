@@ -18,6 +18,7 @@ async def get_all_organizations(session: SessionDep):
     try:
         result = await session.execute(select(OrganizationsModel))
         organizations = result.scalars().all()
+        await session.commit()
         return organizations
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
