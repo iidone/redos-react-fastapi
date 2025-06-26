@@ -66,7 +66,7 @@ async def add_records(
                     else:
                         item_data[col_name] = faker.word().capitalize()
                 elif "int" in col_type.lower():
-                    item_data[col_name] = faker.random_int(1, 1000)
+                    item_data[col_name] = faker.random_int(1, 100)
                 elif "datetime" in col_type.lower():
                     item_data[col_name] = datetime.now()
                 elif "boolean" in col_type.lower():
