@@ -13,6 +13,15 @@ table_configs = {
             "email": Column(String(50)),
         }
     },
+    "organizations_members": {
+        "columns": {
+            "id": Column(Integer, primary_key=True),
+            "member_id": Column(Integer),
+            "organization_id": Column(Integer),
+            "organizer_id": Column(Integer),
+            "assigned_at": Column(DateTime),
+        }
+    },
 }
 
 def get_model(table_name: str):

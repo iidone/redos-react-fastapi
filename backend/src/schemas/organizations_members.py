@@ -4,9 +4,10 @@ from datetime import datetime
 
 
 class OrganizationMemberBase(BaseModel):
-    user_id: int = Field(..., description="ID пользователя")
+    member_id: int = Field(..., description="ID пользователя")
     organization_id: int = Field(..., description="ID организации")
-    assigned_by: int = Field(..., description="ID пользователя, добавившего в организацию")
+    organizer_id: int = Field(..., description="ID организации")
+
 
 class OrganizationMemberCreate(OrganizationMemberBase):
     pass
