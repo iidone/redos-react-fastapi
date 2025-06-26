@@ -10,13 +10,11 @@ body, html {
 
 .dashboard-container {
     display: flex;
-    position: relative;
     gap: 2rem;
     padding: 1rem;
     max-width: 98vw;
     width: 95%;
     transition: all ease .3s;
-    top: -20vh;
 }
 
 .table-container {
@@ -25,6 +23,7 @@ body, html {
     background-color: rgba(51, 51, 51, 0.8);
     padding: 1.5rem;
     transition: all ease .3s;
+    margin-top: 45vh;
 }
 
 .table-header {
