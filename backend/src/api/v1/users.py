@@ -1,7 +1,8 @@
 from typing_extensions import List
-from fastapi import APIRouter, HTTPException, status, Depends, Response
+from fastapi import APIRouter, HTTPException, status, Depends, Response, Path
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select, delete
+from src.models.organizations import OrganizationsModel
 from src.models.users import UsersModel
 from src.schemas.users import DeleteMasterRequest, UsersSchema, UserResponce, UserCreate
 from src.services.auth import (
@@ -112,3 +113,58 @@ async def get_all_users(session: SessionDep):
         return users
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+    
+    
+    
+@router.delete(
+    "/{user_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    tags = ["Пользователи"],
+    summary="Удалить пользователя",
+    responses={
+        204: {"description": "Пользователь успешно удален"},
+        404: {"description": "Пользователь не найден"},
+        400: {"description": "Невозможно удалить пользователя (есть связанные данные)"},
+        422: {"description": "Ошибка валидации параметров"}
+    }
+)
+async def delete_user(
+    session: SessionDep,
+    user_id: int = Path(title="ID пользователя", gt=0, example=1),
+):
+    try:
+        user = await session.scalar(
+            select(UsersModel).where(UsersModel.id == user_id)
+        )
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Пользователь не найден"
+            )
+        has_organizations = await session.scalar(
+            select(OrganizationsModel)
+            .where(OrganizationsModel.created_by == user_id)
+            .limit(1)
+        )
+        
+        if has_organizations:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Невозможно удалить пользователя: у него есть созданные организации"
+            )
+
+        await session.execute(
+            delete(UsersModel).where(UsersModel.id == user_id)
+        )
+        await session.commit()
+        return None
+
+    except HTTPException:
+        raise
+        
+    except Exception as e:
+        await session.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Ошибка при удалении пользователя: {str(e)}"
+        )
