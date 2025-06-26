@@ -10,8 +10,7 @@ app.include_router(main_router)
 origins = [
     "http://localhost",
     "http://localhost:3000",
-    "http://localhost:5173"
-    "https://your-production-domain.com",
+    "http://localhost:5173",
 ]
 
 app.add_middleware(
