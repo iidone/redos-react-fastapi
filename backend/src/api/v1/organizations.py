@@ -72,7 +72,7 @@ async def create_organization(
         )
         
         
-@router.delete("/organizations/{organizations_id}", 
+@router.delete("/{organizations_id}", 
     status_code=status.HTTP_204_NO_CONTENT,
     tags=["Организации"],
     summary="Удалить организацию")
