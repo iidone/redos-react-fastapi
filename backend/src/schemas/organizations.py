@@ -1,18 +1,17 @@
-from pydantic import BaseModel, Field
-from typing import Optional
+from pydantic import BaseModel
 from datetime import datetime
 
+class OrganizationCreate(BaseModel):
+    name: str
+    description: str
+    created_by: int
 
-class OrganizationsBase(BaseModel):
-    name: str = Field(..., min_length=2, max_length=100)
-    description: Optional[str] = Field(None, max_length=500)
-
-class OrganizationCreate(OrganizationsBase):
-    pass
-
-class OrganizationResponce(OrganizationsBase):
+class OrganizationResponce(BaseModel):
     id: int
+    name: str
+    description: str
+    created_by: int
     created_at: datetime
 
     class Config:
-        from_attributes = True
+        from_attributes = True  #
