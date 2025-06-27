@@ -12,8 +12,20 @@ class OrganizationMemberBase(BaseModel):
 class OrganizationMemberCreate(OrganizationMemberBase):
     pass    
 
-class OrganizationMemberResponce(OrganizationMemberBase):
+class OrganizationMemberResponse(BaseModel):
+    id: int
+    member_id: int
+    member_name: str
+    organization_id: int
+    organization_name: str
+    organizer_id: int
+    organizer_name: str
     assigned_at: datetime
 
     class Config:
         from_attributes = True
+        
+        
+        
+        
+        
