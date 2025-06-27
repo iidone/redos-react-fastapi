@@ -10,7 +10,7 @@ class OrganizationMemberBase(BaseModel):
 
 
 class OrganizationMemberCreate(OrganizationMemberBase):
-    pass
+    pass    
 
 class OrganizationMemberResponce(OrganizationMemberBase):
     assigned_at: datetime

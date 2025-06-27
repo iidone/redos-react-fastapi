@@ -4,7 +4,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.database.database import Base
 
 class OrganizationsMembersModel(Base):
-    __tablename__ = "organization_members"
+    __tablename__ = "organizations_members"
 
     member_id: Mapped[int] = mapped_column(
         ForeignKey("users.id", name="fk_member"),

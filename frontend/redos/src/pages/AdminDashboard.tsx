@@ -5,9 +5,9 @@ import axios from 'axios';
 
 interface Member {
   id: number;
-  member_name: string;
-  organization: string;
-  organizer_name: string;
+  member_id: number;
+  organization_id: number;
+  organizer_id: number;
   assigned_at: string;
 }
 
@@ -23,15 +23,16 @@ const MembersTable = () => {
   const [members, setMembers] = useState<Member[]>([]);
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingOrganizations, setLoadingOrganizations] = useState(true);
+  const [loadingMembers, setLoadingMembers] = useState(true);
 
 useEffect(() => {
   const fetchData = async () => {
     try {
       const response = await axios.get('http://127.0.0.1:8000/v1/organizations/organizations');
       console.log('Full API Response:', response);
-      
-      // Проверьте, где именно лежит массив организаций
-      const orgsData = response.data; // или response.data.results / response.data.items
+
+      const orgsData = response.data;
       console.log('Raw organizations data:', orgsData);
 
       if (!orgsData || !Array.isArray(orgsData)) {
@@ -52,12 +53,47 @@ useEffect(() => {
     } catch (error) {
       console.error('Error:', error);
     } finally {
-      setLoading(false);
+      setLoadingOrganizations(false);
     }
   };
 
   fetchData();
 }, []);
+
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const response = await axios.get('http://127.0.0.1:8000/v1/organizations_members/organizations_members');
+      console.log('Full API Response:', response);
+
+      const membersData = response.data;
+      console.log('Raw members data:', membersData);
+
+      if (!membersData || !Array.isArray(membersData)) {
+        console.error('Data is not an array:', membersData);
+        return;
+      }
+
+      setMembers(membersData.map(member => ({
+        id: Number(member.member_id) * 100000 + Number(member.organization_id),
+        member_id: member.member_id,
+        organization_id: member.organization_id,
+        organizer_id: member.organizer_id,
+        assigned_at: new Date(member.assigned_at).toLocaleString()
+      })));
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setLoadingMembers(false);
+    }
+  };
+
+  fetchData();
+}, []);
+
+useEffect(() => {
+  setLoading(loadingOrganizations || loadingMembers);
+}, [loadingOrganizations, loadingMembers]);
 
   return (
     <>
@@ -84,8 +120,8 @@ useEffect(() => {
           </div>
         </div>
         
-        {loading ? (
-          <div className="loading-indicator">Loading...</div>
+        {loadingMembers ? (
+          <div className="loading-indicator">Loading members...</div>
         ) : (
           <div className="table-wrapper">
             <table className="data-table">
@@ -100,11 +136,11 @@ useEffect(() => {
               </thead>
               <tbody>
                 {members.map((member, index) => (
-                  <tr key={member.id}>
+                  <tr key={`${member.member_id}-${member.organization_id}`}>
                     <td>{index + 1}</td>
-                    <td>{member.member_name}</td>
-                    <td>{member.organization}</td>
-                    <td>{member.organizer_name}</td>
+                    <td>{member.member_id}</td>
+                    <td>{member.organization_id}</td>
+                    <td>{member.organizer_id}</td>
                     <td>{member.assigned_at}</td>
                   </tr>
                 ))}
@@ -127,8 +163,8 @@ useEffect(() => {
           </div>
         </div>
         
-        {loading ? (
-          <div className="loading-indicator">Loading...</div>
+        {loadingOrganizations ? (
+          <div className="loading-indicator">Loading organizations...</div>
         ) : (
           <div className="table-wrapper">
             <table className="data-table">
