@@ -87,7 +87,7 @@ async def delete_organization(
         if not org:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Organization not found"
+                detail="Организация не найдена"
             )
         has_users = await session.scalar(
             select(UsersModel).where(UsersModel.organization_id == organization_id).limit(1)
@@ -95,7 +95,7 @@ async def delete_organization(
         if has_users:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Cannot delete organization with attached users"
+                detail="Невозможно удалить организацию: в ней есть участники"
             )
         await session.delete(org)
         await session.commit()
@@ -106,5 +106,5 @@ async def delete_organization(
         await session.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error deleting organization: {str(e)}"
+            detail=f"Ошибка удаления: {str(e)}"
         )

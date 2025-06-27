@@ -57,7 +57,7 @@ async def add_records(
                 if "str" in col_type.lower() or "text" in col_type.lower():
                     if "email" in col_name.lower():
                         item_data[col_name] = faker.email()
-                    elif "first_name" in col_name.lower():
+                    elif "full_name" in col_name.lower():
                         item_data[col_name] = faker.name()
                     elif "role" in col_name.lower():
                         item_data[col_name] = "member"

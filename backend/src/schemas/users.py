@@ -1,11 +1,11 @@
 from pydantic import BaseModel
 from typing_extensions import List
+from enum import Enum
 
 class UsersSchema(BaseModel):
     role: str
     username: str
-    first_name: str
-    last_name: str
+    full_name: str
     password: str
     email: str
 
@@ -18,3 +18,19 @@ class UserCreate(UsersSchema):
 
 class UserResponce(UsersSchema):
     id: int
+    
+class UserRole(str, Enum):
+    ORGANIZER = "organizer"
+    ADMIN = "admin"
+    
+    
+class UpdateUserRole(BaseModel):
+    role: UserRole 
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "role": "organizer"
+            },
+            "description": "Допустимые значения: 'organizer', 'admin'"
+        }

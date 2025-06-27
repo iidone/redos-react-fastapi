@@ -4,7 +4,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select, delete
 from src.models.organizations import OrganizationsModel
 from src.models.users import UsersModel
-from src.schemas.users import DeleteMasterRequest, UsersSchema, UserResponce, UserCreate
+from src.schemas.users import DeleteMasterRequest, UsersSchema, UserResponce, UserCreate, UpdateUserRole
 from src.services.auth import (
     add_to_blacklist,
     pwd_context, 
@@ -39,8 +39,13 @@ async def login_user(
         "user_info": {
             "username": user.username,
             "user_id": user.id,
+<<<<<<< HEAD
             "role": user.role,
             "first_name": user.first_name,
+=======
+            "user_role": user.role,
+            "full_name": user.full_name,
+>>>>>>> cad7c4e39ddea2de2b52a3963b45034f50639654
         }
     }
 
@@ -82,8 +87,7 @@ async def add_user(user_data: UsersSchema, session: SessionDep):
         new_user = UsersModel(
             role=user_data.role,
             username=user_data.username,
-            first_name=user_data.first_name,
-            last_name=user_data.last_name,
+            full_name=user_data.full_name,
             password=pwd_context.hash(user_data.password),
             email=user_data.email,
         )
@@ -168,3 +172,34 @@ async def delete_user(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Ошибка при удалении пользователя: {str(e)}"
         )
+        
+        
+@router.patch('/{user_id}/role',
+            response_model = UsersSchema,
+            tags = ["Пользователи"],
+            summary="Обновить роль пользователя")
+async def update_user_role(
+    user_id: int,
+    role_update: UpdateUserRole,
+    session: SessionDep
+):
+    try:
+        user = await session.execute(
+            select(UsersModel)
+            .where(UsersModel.id == user_id)
+        )
+        user = user.scalar_one_or_none()
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Заявка не найдена"
+            )
+        user.role = role_update.role
+        await session.commit()
+        await session.refresh(user)
+        return user
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Ошибка при обновлении роли пользователя: {str(e)}"
+            )
