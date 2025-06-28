@@ -2,14 +2,13 @@ body, html {
     height: 100%;
     margin: 0;
     display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
 .notfound {
     border-bottom: 2px solid #cd3d3c;
     user-select: none;
     transition: all ease .3s;
+    margin-top: 35vh;
 }
 
 .notfound h1 {

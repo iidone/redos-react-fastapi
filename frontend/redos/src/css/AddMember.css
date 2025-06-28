@@ -1,0 +1,22 @@
+.central-header-content-add {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 98vw;
+    margin: 0 auto;
+}
+
+.header-button {
+    background-color: #cd3d3c;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all ease .3s;
+    user-select: none;
+}
+
+.header-button:hover {
+    background-color: #d45050;
+}

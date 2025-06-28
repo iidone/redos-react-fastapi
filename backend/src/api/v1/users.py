@@ -40,8 +40,6 @@ async def login_user(
             "username": user.username,
             "user_id": user.id,
             "role": user.role,
-            "first_name": user.first_name,
-            "user_role": user.role,
             "full_name": user.full_name,
         }
     }

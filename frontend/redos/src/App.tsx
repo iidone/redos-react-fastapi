@@ -1,12 +1,13 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthContext } from './context/AuthContext';
 import { useContext } from 'react';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import AdminDashboard from './pages/AdminDashboard';
-import OrganizerDashboard from './pages/OrganizerDashboard';
-import MemberDashboard from './pages/MemberDashboard';
-import NotFound from './pages/NotFound';
+import Login from './components/Login';
+import Register from './components/Register';
+import AdminDashboard from './components/AdminDashboard';
+import OrganizerDashboard from './components/OrganizerDashboard';
+import MemberDashboard from './components/MemberDashboard';
+import NotFound from './components/NotFound';
+import AddMember from './components/AddMember';
 
 function App() {
 
@@ -29,6 +30,7 @@ function App() {
           <Route path="/member" element={userRole === 'member' ? <MemberDashboard /> : <Navigate to="/" />} />
         </>
       )}
+      <Route path="/addmember" element={<AddMember />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

@@ -2,8 +2,6 @@ body, html {
     height: 100%;
     margin: 0;
     display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
 .box {
@@ -14,6 +12,7 @@ body, html {
     border-radius: 1rem;
     color: aliceblue;
     padding: 3rem;
+    margin-top: 15vh;
 }
 
 .centrical {

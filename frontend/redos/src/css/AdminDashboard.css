@@ -1,11 +1,9 @@
 body, html {
     height: 100%;
     margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     background-color: #222222;
     transition: all ease .3s;
+    justify-content: center;
 }
 
 .dashboard-container {
@@ -15,6 +13,8 @@ body, html {
     max-width: 98vw;
     width: 95%;
     transition: all ease .3s;
+    margin-top: 6rem;
+    align-items: flex-start;
 }
 
 .table-container {
@@ -23,7 +23,6 @@ body, html {
     background-color: rgba(51, 51, 51, 0.8);
     padding: 1.5rem;
     transition: all ease .3s;
-    margin-top: 223rem;
 }
 
 .table-header {
