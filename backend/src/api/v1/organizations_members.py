@@ -29,6 +29,7 @@ async def get_members(session: SessionDep):
                 OrganizationsMembersModel.assigned_at,
                 OrganizationsMembersModel.id
             )
+            .select_from(OrganizationsMembersModel)
             .join(MemberUser, MemberUser.id == OrganizationsMembersModel.member_id)
             .join(OrganizationsModel, OrganizationsModel.id == OrganizationsMembersModel.organization_id)
             .join(OrganizerUser, OrganizerUser.id == OrganizationsMembersModel.organizer_id)

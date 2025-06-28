@@ -15,31 +15,30 @@ async def verify_user(
     organizer_id: int,
     session: SessionDep
 ):
-    org_member = await session.scalar(
-        select(OrganizationsMembersModel).where(
-            OrganizationsMembersModel.member_id == organizer_id,
-            OrganizationsMembersModel.organization_id == organization_id
-        )
-    )
-    
-    if not org_member:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Пользователь не является членом этой организации"
-        )
     user = await session.scalar(
         select(UsersModel).where(
             UsersModel.id == organizer_id,
             or_(
-            UsersModel.role == "organizer",
-            UsersModel.role == "admin")
+                UsersModel.role == "organizer",
+                UsersModel.role == "admin"
+            )
         )
-        )
-    
+    )
     if not user:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Недостаточно прав для добавления участников"
         )
-    
+    if user.role != "admin":
+        org_member = await session.scalar(
+            select(OrganizationsMembersModel).where(
+                OrganizationsMembersModel.member_id == organizer_id,
+                OrganizationsMembersModel.organization_id == organization_id
+            )
+        )
+        if not org_member:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Организатор не является членом этой организации"
+            )
     return True
