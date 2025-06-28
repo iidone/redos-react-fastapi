@@ -39,7 +39,11 @@ async def login_user(
         "user_info": {
             "username": user.username,
             "user_id": user.id,
+<<<<<<< HEAD
             "role": user.role,
+=======
+            "user_role": user.role,
+>>>>>>> a07941b7f529cdb6decaa28ce0f66e6648006a90
             "full_name": user.full_name,
         }
     }
