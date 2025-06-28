@@ -31,6 +31,12 @@ body, html {
     color: aliceblue;
 }
 
+.button.is-loading {
+    background-color: #d45050;
+    border-color: #d45050;
+    color: #222222;
+}
+
 .input {
     background-color: #222222;
 }
@@ -89,4 +95,11 @@ body, html {
     width: 3rem;
     user-select: none;
     margin-right: 0.5rem;
+}
+
+.notification-error {
+    text-align: center;
+    margin-bottom: 1rem;
+    user-select: none;
+    color: #cd3d3c;
 }
