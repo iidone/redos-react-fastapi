@@ -1,8 +1,9 @@
+from datetime import datetime
 from typing_extensions import List
 from fastapi import APIRouter, HTTPException, status, Depends, Response, Path
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlalchemy import select, delete
-from src.schemas.organizations import OrganizationResponce, OrganizationCreate
+from sqlalchemy import select, delete, func
+from src.schemas.organizations import OrganizationResponse, OrganizationCreate
 from src.models.users import UsersModel
 from src.models.organizations import OrganizationsModel
 from src.services.auth import SessionDep
@@ -11,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 router = APIRouter(prefix = "/v1/organizations")
 
 @router.get('/organizations', 
-            response_model = List[OrganizationResponce], 
+            response_model = List[OrganizationResponse], 
             tags = ["Организации"], 
             summary=["Все организации"])
 async def get_all_organizations(session: SessionDep):
@@ -23,16 +24,18 @@ async def get_all_organizations(session: SessionDep):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
     
+
 @router.post(
     '/organizations',
-    response_model=OrganizationResponce,
+    response_model=OrganizationResponse,
     status_code=status.HTTP_201_CREATED,
     tags=["Организации"], 
     summary="Добавить организацию"
 )
 async def create_organization(  
     session: SessionDep, 
-    organization: OrganizationCreate):
+    organization: OrganizationCreate
+):
     try:
         existing_org = await session.scalar(
             select(OrganizationsModel).where(OrganizationsModel.name == organization.name)
@@ -42,6 +45,7 @@ async def create_organization(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Organization already exists"
             )
+
         user = await session.scalar(
             select(UsersModel).where(UsersModel.id == organization.created_by)
         )
@@ -50,20 +54,39 @@ async def create_organization(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="User not found"
             )
+
         new_org = OrganizationsModel(
             name=organization.name,
             description=organization.description,
-            created_by=organization.created_by
+            created_by=organization.created_by,
+            created_at=func.now()
         )
         
         session.add(new_org)
+        await session.flush()
+
+        org_from_db = await session.scalar(
+            select(OrganizationsModel).where(OrganizationsModel.id == new_org.id)
+        )
+        
+        if not org_from_db:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to retrieve created organization"
+            )
+            
         await session.commit()
-        await session.refresh(new_org)
-        return OrganizationResponce.model_validate(new_org)
+        
+        return {
+            "id": org_from_db.id,
+            "name": org_from_db.name,
+            "description": org_from_db.description,
+            "created_by": org_from_db.created_by,
+            "created_at": datetime.utcnow()
+        }
 
     except HTTPException:
         raise
-
     except Exception as e:
         await session.rollback()
         raise HTTPException(

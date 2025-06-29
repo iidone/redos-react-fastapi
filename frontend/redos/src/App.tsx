@@ -8,6 +8,10 @@ import OrganizerDashboard from './components/OrganizerDashboard';
 import MemberDashboard from './components/MemberDashboard';
 import NotFound from './components/NotFound';
 import AddMember from './components/AddMember';
+import AdminMembers from './components/AdminMembers';
+import AdminOrganizations from './components/AdminOrganizations';
+import AddOrganization from './components/AddOrganization';
+import AddUser from './components/AddUser';
 
 function App() {
 
@@ -30,7 +34,11 @@ function App() {
           <Route path="/member" element={userRole === 'member' ? <MemberDashboard /> : <Navigate to="/" />} />
         </>
       )}
+      <Route path="/adduser" element={<AddUser />} />
       <Route path="/addmember" element={<AddMember />} />
+      <Route path="/addorganization" element={<AddOrganization />}/>
+      <Route path="/adminmembers" element={<AdminMembers />} />
+      <Route path="/adminorganizations" element={<AdminOrganizations />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

@@ -4,17 +4,20 @@ import { useNavigate } from 'react-router-dom';
 import 'bulma/css/bulma.min.css';
 import '../css/AddMember.css';
 
-const AddOrganization = () => {
+const AddUser = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    description: ''
+    role: 'member',
+    username: '',
+    full_name: '',
+    password: '',
+    email: ''
   });
   
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -27,22 +30,23 @@ const AddOrganization = () => {
     setLoading(true);
     setError('');
 
-    if (!formData.name) {
-      setError('Organization name is required');
+    if (!formData.username || !formData.password || !formData.email) {
+      setError('Username, password and email are required');
       setLoading(false);
       return;
     }
 
     try {
       const token = localStorage.getItem('token');
-      const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
       
       await axios.post(
-        'http://127.0.0.1:8000/v1/organizations/organizations',
+        'http://127.0.0.1:8000/v1/users/users',
         {
-          name: formData.name,
-          description: formData.description,
-          created_by: currentUser.user_id
+          role: formData.role,
+          username: formData.username,
+          full_name: formData.full_name,
+          password: formData.password,
+          email: formData.email
         },
         {
           headers: {
@@ -52,11 +56,11 @@ const AddOrganization = () => {
         }
       );
 
-      navigate('/adminorganizations');
+      navigate('/admin');
     } catch (err) {
-      console.error('Error adding organization:', err);
+      console.error('Error adding user:', err);
       if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.detail || 'Failed to add organization. Please try again.');
+        setError(err.response?.data?.detail || 'Failed to add user. Please try again.');
       } else {
         setError('An unexpected error occurred');
       }
@@ -93,9 +97,9 @@ const AddOrganization = () => {
           <div className="header-actions">
             <button 
               className="header-button" 
-              onClick={() => navigate('/adminorganizations')}
+              onClick={() => navigate('/admin')}
             >
-              Back to Organizations
+              Back to Users
             </button>
           </div>
         </div>
@@ -104,37 +108,80 @@ const AddOrganization = () => {
       <div className="dashboard-container" style={{ justifyContent: 'center', maxWidth: '45vw'}}>
         <div className="table-container-add" style={{ maxWidth: '45vw' }}>
           <div className="table-header">
-            <h2 className="table-title">Create organization</h2>
+            <h2 className="table-title">Create user</h2>
           </div>
           
           <form onSubmit={handleSubmit}>
             <table className="data-table">
               <tbody>
                 <tr>
-                  <td style={{ width: '30%' }}>Name</td>
+                  <td style={{ width: '30%' }}>Role</td>
+                  <td>
+                    <select
+                      className="input"
+                      name="role"
+                      value={formData.role}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="member">Member</option>
+                      <option value="organizer">Organizer</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Username</td>
                   <td>
                     <input
                       className="input"
                       type="text"
-                      name="name"
-                      value={formData.name}
+                      name="username"
+                      value={formData.username}
                       onChange={handleChange}
                       required
-                      placeholder="Organization name"
+                      placeholder="Username"
                     />
                   </td>
                 </tr>
                 <tr>
-                  <td>Description</td>
+                  <td>Full Name</td>
                   <td>
-                    <textarea
+                    <input
                       className="input"
-                      name="description"
-                      value={formData.description}
+                      type="text"
+                      name="full_name"
+                      value={formData.full_name}
                       onChange={handleChange}
-                      placeholder="Organization description"
-                      style={{ minHeight: '100px' }}
-                      maxLength={200}
+                      placeholder="Full name"
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <td>Email</td>
+                  <td>
+                    <input
+                      className="input"
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                      placeholder="Email"
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <td>Password</td>
+                  <td>
+                    <input
+                      className="input"
+                      type="password"
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      required
+                      placeholder="Password"
                     />
                   </td>
                 </tr>
@@ -153,7 +200,7 @@ const AddOrganization = () => {
                 className={`action-button add-button ${loading ? 'is-loading' : ''}`}
                 disabled={loading}
               >
-                Create Organization
+                Create User
               </button>
             </div>
           </form>
@@ -163,4 +210,4 @@ const AddOrganization = () => {
   );
 };
 
-export default AddOrganization;
+export default AddUser;

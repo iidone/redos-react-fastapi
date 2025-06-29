@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import 'bulma/css/bulma.min.css';
-import '../css/AdminDashboard.css';
+import '../css/AddMember.css';
 
 interface Organization {
   id: number;
@@ -158,8 +158,27 @@ const AddMember = () => {
     <>
       <header className="dashboard-header" style={{ backgroundColor: 'rgb(51 51 51)' }}>
         <div className="header-content">
-          <img src="src/assets/logo.png" alt="" className="logo"/>
-          <h1 className="header-title">Admin Dashboard</h1>
+          <div className="centrical-header">
+            <img src="src/assets/logo.png" alt="" className="logo"/>
+            <button 
+              className="header-nav-bar" 
+              onClick={() => navigate('/admin')}
+            >
+              Users
+            </button>
+            <button 
+              className="header-nav-bar" 
+              onClick={() => navigate('/adminmembers')}
+            >
+              Members
+            </button>
+            <button 
+              className="header-nav-bar" 
+              onClick={() => navigate('/adminorganizations')}
+            >
+              Organizations
+            </button>
+          </div>
           <div className="header-actions">
             <button 
               className="header-button" 
@@ -171,10 +190,10 @@ const AddMember = () => {
         </div>
       </header>
       
-      <div className="dashboard-container" style={{ justifyContent: 'center' }}>
-        <div className="table-container" style={{ maxWidth: '800px' }}>
+      <div className="dashboard-container" style={{ justifyContent: 'center', maxWidth: '45vw'}}>
+        <div className="table-container-add" style={{ maxWidth: '45vw' }}>
           <div className="table-header">
-            <h2 className="table-title">Add Member to Organization</h2>
+            <h2 className="table-title">Add member to organization</h2>
           </div>
           
           <form onSubmit={handleSubmit}>
