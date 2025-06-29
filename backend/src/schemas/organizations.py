@@ -7,11 +7,11 @@ class OrganizationCreate(BaseModel):
     description: str
     created_by: int
 
-class OrganizationResponce(BaseModel):
+class OrganizationResponse(BaseModel):
     id: int
     name: str
-    description: str
-    created_by: str
+    description: str | None
+    created_by: int
     created_at: datetime
 
     class Config:

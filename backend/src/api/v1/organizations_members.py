@@ -13,11 +13,12 @@ from src.services.VerifyUser import verify_user
 router = APIRouter(prefix = "/v1/organizations_members", tags = ["Участники"])
 
 
-@router.get("/", response_model=List[OrganizationMemberResponse], summary="Все участники")
+@router.get("/", response_model=List[OrganizationMemberResponse])
 async def get_members(session: SessionDep):
     try:
         MemberUser = aliased(UsersModel)
         OrganizerUser = aliased(UsersModel)
+        
         query = (
             select(
                 OrganizationsMembersModel.member_id,
@@ -34,8 +35,10 @@ async def get_members(session: SessionDep):
             .join(OrganizationsModel, OrganizationsModel.id == OrganizationsMembersModel.organization_id)
             .join(OrganizerUser, OrganizerUser.id == OrganizationsMembersModel.organizer_id)
         )
+        
         result = await session.execute(query)
         return result.mappings().all()
+        
     except Exception as e:
         raise HTTPException(
             status_code=500,

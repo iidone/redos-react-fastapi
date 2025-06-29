@@ -1,0 +1,46 @@
+.central-header-content-add {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 98vw;
+    margin: 0 auto;
+}
+
+.header-button {
+    background-color: #cd3d3c;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all ease .3s;
+    user-select: none;
+}
+
+.header-button:hover {
+    background-color: #d45050;
+}
+
+
+.table-container-add {
+    flex: 1;
+    min-width: 35vw;
+    background-color: rgba(51, 51, 51, 0.8);
+    padding: 1.5rem;
+    transition: all ease .3s;
+    margin-top: 20vh;
+}
+
+.header-nav-bar {
+    color: aliceblue;
+    font-size: 20px;
+    user-select: none;
+}
+
+.header-nav-bar:hover {
+    color: #cd3d3c;
+}
+
+textarea {
+    resize: none;
+}
