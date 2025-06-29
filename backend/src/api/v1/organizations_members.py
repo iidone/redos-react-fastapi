@@ -8,7 +8,7 @@ from src.models.organizations import OrganizationsModel
 from src.models.organizations_members import OrganizationsMembersModel
 from src.schemas.organizations_members import OrganizationMemberResponse, OrganizationMemberCreate
 from src.services.auth import SessionDep
-from src.services.verify_user import verify_user
+from src.services.VerifyUser import verify_user
 
 router = APIRouter(prefix = "/v1/organizations_members", tags = ["Участники"])
 

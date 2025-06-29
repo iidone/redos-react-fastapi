@@ -1,4 +1,5 @@
 from sqlalchemy import select
+from typing import Optional
 from typing_extensions import Annotated
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,6 +11,8 @@ from datetime import datetime, timedelta
 import os
 from dotenv import load_dotenv
 from pathlib import Path
+from pydantic import BaseModel
+from src.models.users import UsersModel 
 
 env_path = Path(__file__).parent.parent.parent / ".env"
 load_dotenv(env_path)
@@ -30,6 +33,10 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 token_blacklist = {}
+
+
+class TokenData(BaseModel):
+    username: Optional[str] = None
 
 
 def create_access_token(data: dict):
@@ -63,3 +70,32 @@ async def add_to_blacklist(token: str):
         token_blacklist[token] = expiry
     except JWTError:
         pass
+    
+async def get_current_user(
+    token: Annotated[str, Depends(oauth2_scheme)],
+    session: SessionDep
+) -> UsersModel:
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Не удалось подтвердить учетные данные",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    
+    # Проверка в черном списке
+    if token in token_blacklist:
+        raise credentials_exception
+    
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+        token_data = TokenData(username=username)
+    except JWTError as e:
+        raise credentials_exception from e
+    
+    user = await get_user_by_username(token_data.username, session)
+    if user is None:
+        raise credentials_exception
+    
+    return user

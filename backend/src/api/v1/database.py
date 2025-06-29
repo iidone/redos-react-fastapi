@@ -4,7 +4,7 @@ from src.database.database import engine, Base, get_session
 from sqlalchemy.orm import Session
 from sqlalchemy import String
 from src.models.users import UsersModel
-from src.models.certificates import CertificatesModel
+from src.models.koji_certificates import KojiCertificate
 from src.models.certificates_requests import CertificatesRequestsModel
 from src.models.organizations import OrganizationsModel
 from src.models.organizations_members import OrganizationsMembersModel

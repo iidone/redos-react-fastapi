@@ -2,11 +2,17 @@ from typing_extensions import List
 from fastapi import APIRouter, HTTPException, status, Depends, Response, Path
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select, delete
+from sqlalchemy.orm import aliased
+from datetime import datetime
+from sqlalchemy.orm import selectinload
 from src.schemas.organizations import OrganizationResponce, OrganizationCreate
-from src.models.users import UsersModel
+from src.schemas.organizations_members import OrganizationMemberResponse
+from src.models.users import UsersModel 
 from src.models.organizations import OrganizationsModel
+from src.models.organizations_members import OrganizationsMembersModel
 from src.services.auth import SessionDep
 from sqlalchemy.ext.asyncio import AsyncSession
+from src.schemas.organizations import OrganizationWithMembersResponse, MemberResponse
 
 router = APIRouter(prefix = "/v1/organizations")
 
@@ -16,10 +22,31 @@ router = APIRouter(prefix = "/v1/organizations")
             summary=["Все организации"])
 async def get_all_organizations(session: SessionDep):
     try:
-        result = await session.execute(select(OrganizationsModel))
-        organizations = result.scalars().all()
-        await session.commit()
+        Creator = aliased(UsersModel)
+        query = (
+            select(
+                OrganizationsModel,
+                Creator.full_name.label("creator_name")
+            )
+            .join(Creator, OrganizationsModel.created_by == Creator.id)
+            .order_by(OrganizationsModel.name)
+        )
+        
+        result = await session.execute(query)
+        
+        organizations = []
+        for org, creator_name in result:
+            org_dict = {
+                "id": org.id,
+                "name": org.name,
+                "description": org.description,
+                "created_by": creator_name,
+                "created_at": org.created_at
+            }
+            organizations.append(org_dict)
+        
         return organizations
+    
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
     
@@ -108,3 +135,46 @@ async def delete_organization(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Ошибка удаления: {str(e)}"
         )
+        
+        
+        
+@router.get(
+    "/{organization_id}",
+    response_model=OrganizationWithMembersResponse,
+    summary="Получить организацию и её членов"
+)
+async def get_organization_with_members(
+    organization_id: int,
+    session: SessionDep
+):
+    # Получаем организацию
+    org = await session.get(OrganizationsModel, organization_id)
+    if not org:
+        raise HTTPException(status_code=404, detail="Organization not found")
+
+    # Получаем всех членов организации с информацией о пользователях
+    members_query = await session.execute(
+        select(OrganizationsMembersModel, UsersModel)
+        .join(UsersModel, OrganizationsMembersModel.member_id == UsersModel.id)
+        .where(OrganizationsMembersModel.organization_id == organization_id)
+    )
+    
+    # Формируем ответ
+    members_response = [
+        MemberResponse(
+            user_id=user.id,
+            username=user.username,
+            email=user.email,
+            role=user.role, 
+        )
+        for member, user in members_query.all()
+    ]
+
+    return OrganizationWithMembersResponse(
+        id=org.id,
+        name=org.name,
+        description=org.description,
+        created_at=org.created_at,
+        members=members_response
+    )
+
