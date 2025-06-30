@@ -10,8 +10,8 @@ class OrganizationCreate(BaseModel):
 class OrganizationResponse(BaseModel):
     id: int
     name: str
-    description: str | None
-    created_by: int
+    description: str
+    created_by: str
     created_at: datetime
 
     class Config:
