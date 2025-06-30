@@ -118,7 +118,7 @@ const AddUser = () => {
                   <td style={{ width: '30%' }}>Role</td>
                   <td>
                     <select
-                      className="input"
+                      className="user-input"
                       name="role"
                       value={formData.role}
                       onChange={handleChange}

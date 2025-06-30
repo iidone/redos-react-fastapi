@@ -28,7 +28,7 @@
     background-color: rgba(51, 51, 51, 0.8);
     padding: 1.5rem;
     transition: all ease .3s;
-    margin-top: 20vh;
+    margin-top: 15vh;
 }
 
 .header-nav-bar {
@@ -43,4 +43,20 @@
 
 textarea {
     resize: none;
+}
+
+select.user-input {
+    color: aliceblue;
+    background-color: #222222;
+    border: 1px solid #3b3b3b;
+    border-radius: 5px;
+    font-size: 1rem;
+    box-sizing: border-box;
+    padding: 0.4rem;
+}
+
+select.user-input:focus {
+    outline: none;
+    border-color: #cd3d3c;
+    box-shadow: 0 0 0 0.125em #222222;
 }

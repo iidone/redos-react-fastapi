@@ -6,7 +6,7 @@ from sqlalchemy import select, delete
 from sqlalchemy.orm import aliased
 from datetime import datetime
 from sqlalchemy.orm import selectinload
-from src.schemas.organizations import OrganizationResponce, OrganizationCreate
+from src.schemas.organizations import OrganizationResponse, OrganizationCreate
 from src.schemas.organizations_members import OrganizationMemberResponse
 from src.models.users import UsersModel 
 from sqlalchemy import select, delete, func
@@ -125,7 +125,7 @@ async def create_organization(
         )
         
         
-@router.delete("/{organizations_id}", 
+@router.delete("/{organization_id}", 
     status_code=status.HTTP_204_NO_CONTENT,
     tags=["Организации"],
     summary="Удалить организацию")
@@ -173,19 +173,16 @@ async def get_organization_with_members(
     organization_id: int,
     session: SessionDep
 ):
-    # Получаем организацию
     org = await session.get(OrganizationsModel, organization_id)
     if not org:
         raise HTTPException(status_code=404, detail="Organization not found")
 
-    # Получаем всех членов организации с информацией о пользователях
     members_query = await session.execute(
         select(OrganizationsMembersModel, UsersModel)
         .join(UsersModel, OrganizationsMembersModel.member_id == UsersModel.id)
         .where(OrganizationsMembersModel.organization_id == organization_id)
     )
-    
-    # Формируем ответ
+
     members_response = [
         MemberResponse(
             user_id=user.id,

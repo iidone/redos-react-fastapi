@@ -38,6 +38,7 @@ body, html {
 
 .input {
     background-color: #222222;
+    padding: 1rem;
 }
 
 .input:active {
