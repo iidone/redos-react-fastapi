@@ -174,19 +174,16 @@ async def get_organization_with_members(
     organization_id: int,
     session: SessionDep
 ):
-    # Получаем организацию
     org = await session.get(OrganizationsModel, organization_id)
     if not org:
         raise HTTPException(status_code=404, detail="Organization not found")
 
-    # Получаем всех членов организации с информацией о пользователях
     members_query = await session.execute(
         select(OrganizationsMembersModel, UsersModel)
         .join(UsersModel, OrganizationsMembersModel.member_id == UsersModel.id)
         .where(OrganizationsMembersModel.organization_id == organization_id)
     )
-    
-    # Формируем ответ
+
     members_response = [
         MemberResponse(
             user_id=user.id,

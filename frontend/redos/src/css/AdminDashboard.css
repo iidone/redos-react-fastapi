@@ -91,7 +91,6 @@ body, html {
 .data-table th,
 .data-table td {
     padding: 14px;
-    text-align: left;
     border-bottom: 1px solid rgba(240, 248, 255, 0.2);
     color: aliceblue;
     transition: all ease .3s;
@@ -185,36 +184,64 @@ body, html {
 }
 
 .button.is-small {
-  padding: 0.25rem 0.5rem;
-  font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
 }
 
 .mr-2 {
-  margin-right: 0.5rem;
+    margin-right: 0.5rem;
 }
 
 .icon .fas {
-  font-size: 1rem;
-  background-color: transparent;
+    font-size: 0.75rem;
+    background-color: transparent;
 }
 
-.input {
-  padding: 0.25rem;
+select.role-input {
+    width: 6rem !important;
 }
 
+.role-input {
+    color: aliceblue;
+    background-color: #222222;
+    border: 1px solid #d45050;
+    border-radius: 4px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.role-input:focus {
+    outline: none;
+    border-color: #cd3d3c;
+    box-shadow: 0 0 0 0.125em #222222;
+}
 
 .search-input {
-  padding: 0.5rem 1rem;
-  color: aliceblue;
-  background-color: #222222;
-  border: 1px solid #d45050;
-  border-radius: 4px;
-  font-size: 16px;
-  box-sizing: border-box;
+    padding: 0.5rem 1rem;
+    color: aliceblue;
+    background-color: #222222;
+    border: 1px solid #d45050;
+    border-radius: 4px;
+    font-size: 16px;
+    box-sizing: border-box;
 }
 
 .search-input:focus {
-  outline: none;
-  border-color: #cd3d3c;
-  box-shadow: 0 0 0 0.125em #222222;
+    outline: none;
+    border-color: #cd3d3c;
+    box-shadow: 0 0 0 0.125em #222222;
 }
+
+.actions-cell {
+    display: flex;
+    gap: 5px;
+    min-height: 40px;
+}
+
+.button.is-small {
+    height: 28px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+

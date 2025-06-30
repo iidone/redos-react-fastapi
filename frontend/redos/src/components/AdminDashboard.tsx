@@ -20,6 +20,24 @@ const AdminDashboard = () => {
   const [tempRole, setTempRole] = useState('');
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
+  const [deletingUserId, setDeletingUserId] = useState<number | null>(null);
+
+  const deleteUser = async (userId: number) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`http://127.0.0.1:8000/v1/users/${userId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      setUsers(users.filter(user => user.id !== userId));
+      setDeletingUserId(null);
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      if (axios.isAxiosError(error)) {
+        alert(error.response?.data?.detail || 'Failed to delete user');
+      }
+    }
+  };
+
 
   function logout() {
     localStorage.removeItem('token');
@@ -29,6 +47,37 @@ const AdminDashboard = () => {
   function navigateToAddUser() {
     navigate('/adduser');
   }
+
+  const exportToCSV = () => {
+    const headers = ['№', 'Role', 'Username', 'Full Name', 'Email'];
+
+    const csvData = [
+      headers,
+      ...filteredUsers.map((user, index) => [
+        index + 1,
+        user.role,
+        user.username,
+        user.full_name,
+        user.email
+      ])
+    ];
+
+    const csvContent = csvData.map(row => 
+      row.map(field => `"${field.toString().replace(/"/g, '""')}"`).join(',')
+    ).join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'users_export.csv');
+    link.style.visibility = 'hidden';
+
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+  };
 
   const filteredUsers = users.filter(user => 
     user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -161,7 +210,7 @@ const AdminDashboard = () => {
               <button className="action-button add-button" onClick={navigateToAddUser}>
                 Add user
               </button>
-              <button className="action-button export-button">
+              <button className="action-button export-button" onClick={exportToCSV}>
                 Export to CSV
               </button>
             </div>
@@ -185,12 +234,15 @@ const AdminDashboard = () => {
                 </thead>
                 <tbody>
                   {filteredUsers.map((user, index) => (
-                    <tr key={user.id}>
+                    <tr 
+                      key={user.id} 
+                      className="table-row"
+                    >
                       <td>{index + 1}</td>
                       <td>
                         {editingUserId === user.id ? (
                           <select
-                            className="input"
+                            className="role-input"
                             value={tempRole}
                             onChange={handleRoleChange}
                             style={{ width: '100%' }}
@@ -203,7 +255,7 @@ const AdminDashboard = () => {
                           user.role
                         )}
                       </td>
-                      <td>
+                      <td className="actions-cell">
                         {editingUserId === user.id ? (
                           <>
                             <button 
@@ -219,21 +271,45 @@ const AdminDashboard = () => {
                               Cancel
                             </button>
                           </>
+                        ) : deletingUserId === user.id ? (
+                          <>
+                            <button 
+                              className="button is-small is-danger mr-2"
+                              onClick={() => deleteUser(user.id)}
+                            >
+                              Delete
+                            </button>
+                            <button 
+                              className="button is-small"
+                              onClick={() => setDeletingUserId(null)}
+                            >
+                              Cancel
+                            </button>
+                          </>
                         ) : (
-                          <button 
-                            className="button is-small"
-                            onClick={() => startEditing(user.id, user.role)}
-                          >
-                            <span className="icon">
-                              <i className="fas fa-pencil-alt"></i>
-                            </span>
-                          </button>
+                          <>
+                            <button 
+                              className="button is-small mr-2"
+                              onClick={() => startEditing(user.id, user.role)}
+                            >
+                              <span className="icon">
+                                <i className="fas fa-pencil-alt"></i>
+                              </span>
+                            </button>
+                            <button 
+                              className="button is-small is-danger"
+                              onClick={() => setDeletingUserId(user.id)}
+                            >
+                              <span className="icon">
+                                <i className="fas fa-trash"></i>
+                              </span>
+                            </button>
+                          </>
                         )}
                       </td>
                       <td>{user.username}</td>
                       <td>{user.full_name}</td>
                       <td>{user.email}</td>
-                      
                     </tr>
                   ))}
                 </tbody>

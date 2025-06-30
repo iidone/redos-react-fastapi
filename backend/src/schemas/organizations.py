@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime
-from typing import List
+from typing import List, Union
 
 class OrganizationCreate(BaseModel):
     name: str
@@ -10,8 +10,8 @@ class OrganizationCreate(BaseModel):
 class OrganizationResponse(BaseModel):
     id: int
     name: str
-    description: str
-    created_by: str
+    description: str | None
+    created_by: Union[int, str]
     created_at: datetime
 
     class Config:
