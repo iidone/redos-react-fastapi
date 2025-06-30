@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_serializer
 from datetime import datetime
 from typing import List, Optional, Dict
 
@@ -29,7 +29,7 @@ class CertificateUpdate(BaseModel):
         json_schema_extra = {
             "example": {
                 "revoked": True,
-                "permissions": {"build": False, "admin": True}
+                "permissions": {"build": False, "admin": False, "repo": False}
             }
         }
 
@@ -45,15 +45,18 @@ class CertificateRequest(BaseModel):
 
 class CertificateResponse(BaseModel):
     id: int = Field(..., description="ID сертификата")
-    cert_data: Optional[str] = Field(
-        None,
-        description="Данные сертификата (только для админов)"
+    organization_id: int = Field(..., description="ID организации")
+    organization_name: str = Field(..., description="Название организации")
+    issued_by: int = Field(..., description="ID пользователя, выдавшего сертификат")
+    issued_by_name: str = Field(..., description="Имя пользователя, выдавшего сертификат")
+    valid_from: datetime = Field(..., description="Дата начала действия")
+    valid_to: datetime = Field(..., description="Дата окончания действия")
+    permissions: Dict[str, bool] = Field(
+        default={},
+        description="Права доступа в формате {'build': True, 'admin': False}"
     )
-    private_key: Optional[str] = Field(
-        None,
-        description="Приватный ключ (только при создании)"
-    )
-
+    revoked: bool = Field(..., description="Отозван ли сертификат")
+    
     class Config:
         from_attributes = True
         json_schema_extra = {
@@ -91,22 +94,6 @@ class KojiCertificateAdminResponse(CertificateResponse):
                 "permissions": {"build": True, "admin": False}
             }
         }
-        
-        
-        
-class KojiCertificateList(BaseModel):
-    """Схема для списка сертификатов"""
-    id: int
-    user_id: int
-    organization_id: int
-    issued_by: int
-    valid_from: datetime
-    valid_to: datetime
-    revoked: bool
-
-    class Config:
-        from_attributes = True
-    
     
 
     

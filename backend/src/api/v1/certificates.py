@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from cryptography.hazmat.primitives import serialization, hashes
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 from cryptography.hazmat.primitives import serialization
 from cryptography import x509
 from fastapi import HTTPException
@@ -11,7 +12,7 @@ from datetime import datetime, timedelta
 from typing_extensions import Annotated
 from src.models.organizations_members import OrganizationsMembersModel
 import base64
-from src.schemas.koji_certificates import CertificateResponse, CertificateRequest
+from src.schemas.koji_certificates import CertificateResponse, CertificateRequest, KojiCertificateAdminResponse, CertificateUpdate
 from src.services.auth import SessionDep, get_current_user
 from src.models.users import UsersModel
 from src.models.koji_certificates import KojiCertificate
@@ -56,6 +57,7 @@ async def create_koji_certificate(
             organization_id=request.organization_id,
             issued_by = current_user.id,
             cert_data=cert_pem,
+            fingerprint = fingerprint,
             private_key=key_pem,
             valid_from=datetime.utcnow(),
             valid_to=datetime.utcnow() + timedelta(days=request.valid_days),
@@ -81,8 +83,82 @@ async def create_koji_certificate(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Certificate generation failed: {str(e)}"
         )
-    
-    
+
+
+@router.get("/admin/", response_model=List[KojiCertificateAdminResponse], status_code= status.HTTP_200_OK, summary= "Получить полную информацию о сертификатах")
+async def get_all_certificates_admin(session: SessionDep , current_user: UsersModel = Depends(get_current_user)):
+    if not current_user.role == "admin":
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+    try:
+        stmt = select(KojiCertificate).options(
+            selectinload(KojiCertificate.organization),
+            selectinload(KojiCertificate.issuer)
+        )
+        
+        result = await session.execute(stmt)
+        certs = result.scalars().all()
+        return [{
+            **cert.__dict__,
+            "organization_name": cert.organization.name,
+            "issued_by_name": cert.issuer.username
+        } for cert in certs]
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Ошибка в получении сертификатов: {str(e)}")
+
+
+@router.get("/", response_model= List[CertificateResponse], status_code=status.HTTP_200_OK, summary="Получить сертификаты")
+async def get_certificates(session: SessionDep):
+    try:
+        stmt = select(KojiCertificate).options(
+            selectinload(KojiCertificate.organization),
+            selectinload(KojiCertificate.issuer)
+        )
+        
+        result = await session.execute(stmt)
+        certs = result.scalars().all()
+        return [{
+            **cert.__dict__,
+            "organization_name": cert.organization.name,
+            "issued_by_name": cert.issuer.username
+        } for cert in certs]
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Ошибка в получении сертификатов: {str(e)}")
+
+@router.patch("/{certificate_id}", response_model= CertificateResponse, status_code= status.HTTP_200_OK, summary = "Обновить сертификат")
+async def update_certificate(session: SessionDep, certificate_id: int, update_data: CertificateUpdate, current_user: UsersModel = Depends(get_current_user)):
+    try:
+        result = await session.execute(
+            select(KojiCertificate)
+            .where(KojiCertificate.id == certificate_id)
+            .options(selectinload(KojiCertificate.organization))
+            .options(selectinload(KojiCertificate.issuer))
+        )
+        cert = result.scalar_one_or_none()
+
+        if not cert:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Сертификат не найден"
+            )
+
+        if update_data.revoked is not None:
+            cert.revoked = update_data.revoked
+
+        if update_data.permissions is not None:
+            cert.permissions = update_data.permissions
+
+        await session.commit()
+        await session.refresh(cert)
+
+        return {
+            **cert.__dict__,
+            "organization_name": cert.organization.name,
+            "issued_by_name": cert.issuer.username
+        }
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Ошибка в обновлении сертификата : {str(e)}")
+        
+        
 async def check_cert_permissions(
     current_user: UsersModel,
     target_user_id: int,

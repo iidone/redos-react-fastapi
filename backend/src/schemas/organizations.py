@@ -10,7 +10,7 @@ class OrganizationCreate(BaseModel):
 class OrganizationResponse(BaseModel):
     id: int
     name: str
-    description: str | None
+    description: str
     created_by: Union[int, str]
     created_at: datetime
 

@@ -28,7 +28,7 @@ const AdminMembers = () => {
     try {
       const token = localStorage.getItem('token');
       await axios.delete(
-        `http://127.0.0.1:8000/v1/organizations/${orgId}/members/${memberId}`,
+        `http://127.0.0.1:8000/v1/organizations_members/${orgId}/members/${memberId}`,
         { headers: { 'Authorization': `Bearer ${token}` } }
       );
       

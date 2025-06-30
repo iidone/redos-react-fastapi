@@ -13,7 +13,7 @@ from src.services.VerifyUser import verify_user
 router = APIRouter(prefix = "/v1/organizations_members", tags = ["Участники"])
 
 
-@router.get("/", response_model=List[OrganizationMemberResponse])
+@router.get("/", response_model=List[OrganizationMemberResponse], summary= "Получить всех участников")
 async def get_members(session: SessionDep):
     try:
         MemberUser = aliased(UsersModel)
